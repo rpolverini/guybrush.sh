@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: archive
 title: "¡Mirá atrás tuyo! ¡Un mono de tres cabezas! (Y cómo renombrar tu rama de master a Main en menos de lo que canta un pollo de goma)"
 date: 2026-01-15 11:59:00 -0300
 categories: [git, devops, tutorial]
