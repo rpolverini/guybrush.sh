@@ -1,6 +1,6 @@
 title: guybrush.sh
 description: Notas técnicas, scripts y pensamientos random
-theme: minima
+theme: jekyll-theme-hacker
 markdown: kramdown
 
 author:
