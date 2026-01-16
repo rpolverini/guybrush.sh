@@ -1,0 +1,9 @@
+title: guybrush.sh
+description: Notas técnicas, scripts y pensamientos random
+theme: minima
+markdown: kramdown
+
+author:
+  name: Guybrush Threepwood
+
+show_excerpts: true
