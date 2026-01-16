@@ -1,7 +1,12 @@
 title: guybrush.sh
 description: Notas técnicas, scripts y pensamientos random
+baseurl: "/guybrush.sh"   # <-- EXACTO al nombre del repo
+url: "https://rpolverini.github.io/"
+
 theme: jekyll-theme-hacker
 markdown: kramdown
+
+future: true
 
 author:
   name: Guybrush Threepwood
