@@ -5,7 +5,6 @@ date: 2026-02-25
 categories: [git, devops, aventuras]
 ---
 
-# El día que Windows intentó reescribir toda la historia del repo
 
 Hay enemigos peligrosos en el desarrollo de software.
 
