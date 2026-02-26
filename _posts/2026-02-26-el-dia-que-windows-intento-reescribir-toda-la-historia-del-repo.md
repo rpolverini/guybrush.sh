@@ -24,15 +24,18 @@ Spoiler: no fue magia negra. Fue `CRLF`.
 ## 🏝️ La batalla invisible: LF vs CRLF
 
 En sistemas civilizados (Linux, macOS), el salto de línea es:
-LF → \n
 
+```text
+LF → \n
+```
 
 Minimalista. Elegante. Como un buen script en Python.
 
 En Windows, en cambio:
 
+```text
 CRLF → \r\n
-
+```
 
 Dos caracteres. Porque uno solo claramente no era suficiente.
 
@@ -52,8 +55,8 @@ Y ahí estás vos, mirando 400 líneas “modificadas” donde nadie cambió nad
 ## 🧠 Por qué en otros proyectos no pasa
 
 Porque esos proyectos ya tienen la bendición ancestral:
-.gitattributes
 
+`.gitattributes`
 
 Ese archivo es básicamente el gobernador colonial que le dice a Git:
 
@@ -67,75 +70,116 @@ Ese archivo es básicamente el gobernador colonial que le dice a Git:
 
 ```bash
 touch .gitattributes
+```
 
 Y dentro:
+
+```text
 * text=auto
+```
 
 ¿Qué hace esto?
 
-Normaliza todo a LF cuando se hace commit.
-
-Permite que Windows use CRLF localmente si quiere.
-
-Pero en el repo todo queda prolijo y consistente.
+- Normaliza todo a `LF` cuando se hace commit.
+- Permite que Windows use `CRLF` localmente si quiere.
+- Pero en el repo todo queda prolijo y consistente.
 
 Es como decir:
 
-“En tu casa hacé lo que quieras, pero en el barco mando yo.”
-2️⃣ Configuración recomendada por sistema
+> “En tu casa hacé lo que quieras, pero en el barco mando yo.”
+
+---
+
+### 2️⃣ Configuración recomendada por sistema
 
 Tu compa en Windows:
 
+```bash
 git config --global core.autocrlf true
+```
 
 Vos en Linux:
 
+```bash
 git config --global core.autocrlf input
+```
+
 Traducción pirata:
 
-Windows convierte al bajar.
-
-Linux no toca nada al bajar.
-
-Ambos convierten a LF al subir.
+- Windows convierte al bajar.
+- Linux no toca nada al bajar.
+- Ambos convierten a `LF` al subir.
 
 Paz mundial.
-🧹 ¿Y si ya explotó todo?
+
+---
+
+## 🧹 ¿Y si ya explotó todo?
 
 Si ya hay un commit donde “se modificó todo”:
 
-Asegúrense de no tener cambios pendientes.
+1. Asegúrense de no tener cambios pendientes (`git status` limpio).
+2. Ejecuten:
 
-Ejecuten:
-
+```bash
 git add --renormalize .
+```
 
-Commit correctivo:
+3. Commit correctivo:
 
+```bash
 git commit -m "Normalizando saltos de linea a LF"
+```
 
 Y listo. El repo deja de parecer que fue saqueado por corsarios incompetentes.
 
-⚔️ Lección final
+---
+
+## 🧱 Versión más sólida (para equipos que ya no usan rueditas)
+
+Si querés algo todavía más explícito y profesional:
+
+```text
+* text=auto eol=lf
+```
+
+Y para evitar que Git toque binarios:
+
+```text
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.pdf binary
+```
+
+Porque lo último que queremos es que Git intente “normalizar” una imagen como si fuera un poema.
+
+---
+
+## ⚔️ Lección final
 
 Los conflictos entre sistemas operativos no son técnicos.
 
 Son culturales.
 
-Linux cree en la simplicidad.
+Linux cree en la simplicidad.  
 Windows cree en la sobreingeniería emocional.
 
 Pero Git, como buen capitán, necesita reglas claras.
 
-Si no tenés .gitattributes, no tenés civilización.
+Si no tenés `.gitattributes`, no tenés civilización.
+
+---
 
 La próxima vez que veas un diff donde cambió todo y no cambió nada…
 
-No culpes a tu compañero.
+No culpes a tu compañero.  
+Culpá al retorno de carro.
 
-Culpá al retorno de carro. 🚢
+---
 
 Y recordá:
 
-Un verdadero pirata no le teme a los merges…
-le teme a los saltos de línea mal configurados.
+> Un verdadero pirata no le teme a los merges…  
+> le teme a los saltos de línea mal configurados.
