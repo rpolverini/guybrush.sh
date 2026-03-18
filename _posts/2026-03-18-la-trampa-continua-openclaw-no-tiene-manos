@@ -1,0 +1,182 @@
+---
+layout: post
+title: "OpenClaw y la maldición del perfil messaging (parte 2: exorcismo completo)"
+date: 2026-03-18
+tags: [openclaw, devops, virtualbox, sandbox, debugging, monkey-island-vibes]
+---
+
+Si pensabas que la historia terminaba con el perfil `messaging`…  
+dejame decirte algo, camarada:
+
+**recién estábamos saliendo del tutorial.**
+
+---
+
+## 🪦 Seguía sin andar (y ya era personal)
+
+Después de:
+
+- cambiar profiles  
+- pelear con sandbox  
+- invocar comandos olvidados  
+- sospechar de Docker que ni estaba instalado  
+
+OpenClaw seguía igual:
+
+> hablaba lindo… pero no tocaba nada.
+
+Ni filesystem, ni shell, ni nada.
+
+Era como tener a Guybrush con toda la actitud…  
+pero atado a una silla.
+
+---
+
+## 🧠 Plot twist: no era config… era instalación rota
+
+Ahí cae la ficha:
+
+👉 no era que estaba mal configurado  
+👉 **estaba mal instalado desde el vamos**
+
+La one-liner me había dejado un híbrido raro:
+- sin config persistente  
+- sin comandos completos  
+- sin capacidades reales  
+
+Un OpenClaw… decorativo.
+
+---
+
+## 🧹 El exorcismo (borrón y cuenta nueva)
+
+Acá no hay parche que valga.
+
+Esto fue **wipe total nivel “quemar la isla y empezar de nuevo”**:
+
+### 🧨 Step 1 — Stop & Remove Everything
+
+```bash
+# Stop gateway
+openclaw gateway stop || true
+
+# Uninstall
+npm uninstall -g openclaw
+
+# Limpiar restos
+rm -f /usr/bin/openclaw
+rm -rf /usr/lib/node_modules/openclaw
+
+# Borrar TODO estado
+rm -rf ~/.openclaw ~/.clawdbot ~/.moltbot ~/.molthub
+```
+
+Y el golpe final al background service:
+
+```bash
+# Linux
+systemctl --user disable --now openclaw-gateway.service
+rm -f ~/.config/systemd/user/openclaw-gateway.service
+systemctl --user daemon-reload
+```
+
+---
+
+## 🔍 Step 2 — Verificar que no quede ni el loro
+
+```bash
+command -v openclaw || echo "Binary removed ✓"
+ls ~/.openclaw 2>/dev/null || echo "State dir removed ✓"
+```
+
+👉 Si algo sigue ahí… **no terminaste el ritual.**
+
+---
+
+## 📦 Step 3 — Instalación limpia (la posta)
+
+Con Node 22+:
+
+```bash
+curl -fsSL https://openclaw.ai/install.sh | bash
+```
+
+o:
+
+```bash
+npm install -g openclaw@2026.3.13
+```
+
+---
+
+## 🚀 Step 4 — Onboarding como persona civilizada
+
+```bash
+openclaw onboard
+```
+
+Esto:
+- crea config real  
+- configura workspace  
+- instala gateway  
+- define skills correctamente  
+
+Después:
+
+```bash
+openclaw doctor
+openclaw status
+```
+
+---
+
+## ⚡ Resultado (la parte linda)
+
+Y acá viene lo importante:
+
+👉 **sin tocar una sola config manual**
+
+OpenClaw empezó a:
+
+- ✔ acceder al filesystem  
+- ✔ escribir archivos  
+- ✔ usar shell  
+- ✔ laburar como corresponde  
+
+Desde el workspace… hasta discos.
+
+---
+
+## 🧠 Moraleja técnica
+
+En OpenClaw 2026:
+
+> **si algo no anda, no asumas config… asumí instalación corrupta.**
+
+Porque:
+- el sistema ahora es declarativo  
+- el onboarding arma todo  
+- y tocar JSON a mano es como pelear con espadas usando un pollo de goma
+
+---
+
+## 🏴‍☠️ Conclusión final
+
+Después de horas debuggeando sandbox, profiles y permisos…
+
+el problema real era simple:
+
+👉 **había invocado al demonio… pero con un círculo mal dibujado.**
+
+---
+
+Y recordá, pirata del código:
+
+> a veces no necesitás arreglar el barco…  
+> necesitás hundirlo y construir uno nuevo.
+
+---
+
+Y como diría un viejo sabio del Caribe digital:
+
+**“Nunca confíes en una instalación que ‘más o menos’ funciona… eso termina peor que usar Windows en alta mar.”**
