@@ -1,8 +1,10 @@
 ---
 layout: post
-title: "OpenClaw y la maldición del perfil messaging (parte 2: exorcismo completo) "
+title: "OpenClaw y la maldición del perfil messaging (parte 2: exorcismo completo)"
 date: 2026-03-19
 tags: [openclaw, devops, virtualbox, sandbox, debugging, monkey-island-vibes]
+lang: es
+ref: openclaw-messaging-curse-2
 ---
 
 Si pensabas que la historia terminaba con el perfil `messaging`…  

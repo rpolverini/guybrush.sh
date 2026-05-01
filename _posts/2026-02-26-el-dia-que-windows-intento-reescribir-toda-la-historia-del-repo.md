@@ -3,6 +3,8 @@ layout: post
 title: "El día que Windows intentó reescribir toda la historia del repo"
 date: 2026-02-25
 categories: [git, devops, aventuras]
+lang: es
+ref: windows-crlf-history
 ---
 
 

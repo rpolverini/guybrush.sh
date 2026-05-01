@@ -3,6 +3,8 @@ layout: post
 title: "OpenClaw y la maldición del perfil messaging"
 date: 2026-03-18
 tags: [openclaw, devops, virtualbox, sandbox, monkey-island-vibes]
+lang: es
+ref: openclaw-messaging-curse
 ---
 
 Hay días en los que uno se levanta con ganas de conquistar el Caribe digital… y otros en los que decide instalar OpenClaw v2026.3.2 en una máquina shieldiada dentro de VirtualBox. Yo, claramente, elegí el segundo. Error táctico digno de un pirata que intenta abrir una puerta empujando donde dice “tirar”.
