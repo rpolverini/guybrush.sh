@@ -4,9 +4,20 @@ layout: default
 <div class="hero">
   <img src="{{ "/assets/GuyBrush.png" | relative_url }}" alt="Guybrush Threepwood" class="hero-img">
   <h1>{{ site.title }}</h1>
-  <p class="hero-tagline">{{ site.description }}</p>
+  <p class="hero-tagline">
+    {%- if page.lang == 'en' -%}
+      A ship's log of scripts, backend tricks, and infra stuff worth keeping — so every junior pirate can grab what they need. Always with style.
+    {%- else -%}
+      {{ site.description }}
+    {%- endif -%}
+  </p>
 </div>
 
-{%-include menu_item.html collection=site.data.menu.entries-%}
+{% assign lang = page.lang | default: 'es' %}
+{% if lang == 'en' %}
+  {%-include menu_item.html collection=site.data.menu_en.entries-%}
+{% else %}
+  {%-include menu_item.html collection=site.data.menu.entries-%}
+{% endif %}
 
 {{ content }}

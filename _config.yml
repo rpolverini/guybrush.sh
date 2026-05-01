@@ -20,6 +20,17 @@ theme_config:
 sass:
   style: compressed
 
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      lang: es
+  - scope:
+      path: "en"
+    values:
+      lang: en
+
 plugins:
   - jekyll-feed
   - jekyll-seo-tag

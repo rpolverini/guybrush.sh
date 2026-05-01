@@ -1,0 +1,20 @@
+{% assign current_lang = page.lang | default: 'es' %}
+{% if current_lang == 'es' %}
+  {% assign other_lang = 'en' %}
+  {% assign other_home = '/en/' | relative_url %}
+{% else %}
+  {% assign other_lang = 'es' %}
+  {% assign other_home = '/' | relative_url %}
+{% endif %}
+
+{% if page.ref %}
+  {% assign alt_post = site.posts | where: 'ref', page.ref | where: 'lang', other_lang | first %}
+{% endif %}
+
+<div class="lang-switch">
+{% if alt_post %}
+  <a href="{{ alt_post.url | relative_url }}">[{{ other_lang | upcase }}]</a>
+{% else %}
+  <a href="{{ other_home }}">[{{ other_lang | upcase }}]</a>
+{% endif %}
+</div>

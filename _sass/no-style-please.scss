@@ -132,6 +132,25 @@ blockquote {
   p { margin: 0; }
 }
 
+// --- Language switcher ---
+
+.lang-switch {
+  text-align: right;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+
+  a {
+    color: $accent;
+    border: 1px solid $accent;
+    padding: 0.1em 0.5em;
+
+    &:hover {
+      color: $bg;
+      background: $accent;
+    }
+  }
+}
+
 // --- Post meta ---
 
 .post-meta {

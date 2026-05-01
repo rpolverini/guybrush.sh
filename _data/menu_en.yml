@@ -1,0 +1,16 @@
+entries:
+  - title: info
+    entries:
+      - title: Welcome to **guybrush.sh** ☠️
+      - title: Created by
+        url: https://polverini.com.ar/rpolverini/
+
+  - title: all posts
+    post_list:
+      limit: 5
+      show_more: true
+      show_more_text: See archive...
+      show_more_url: archive.html
+
+  - title: rss
+    url: /feed.xml

@@ -4,6 +4,8 @@ title: "¡Mirá atrás tuyo! ¡Un mono de tres cabezas! (Y cómo renombrar tu ra
 date: 2026-01-15 11:59:00 -0300
 categories: [git, devops, tutorial]
 author: "Guybrush Threepwood"
+lang: es
+ref: rename-master-branch
 ---
 
 ¡Hola! Soy Guybrush Threepwood, y quiero ser un ingeniero de DevOps.
