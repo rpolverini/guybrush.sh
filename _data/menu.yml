@@ -6,12 +6,12 @@ entries:
     entries:
       - title: Bienvenido a **guybrush.sh** ☠️  
       - title: Creado Por Ramiro Polverini
-        url: https://polverini.com.ar/rpolverini/
+        url: https://ramiro.polverini.com.ar
       
 
   - title: all posts
     post_list:
-      limit: 5
+      limit: 10
       show_more: true
       show_more_text: See archive...
       show_more_url: archive.html
@@ -25,7 +25,3 @@ entries:
 
   - title: rss
     url: feed.xml
-  - title: El día que Windows intentó reescribir toda la historia del repo
-    url: /2026/02/26/el-dia-que-windows-intento-reescribir-toda-la-historia-del-repo.html
-  
-  
