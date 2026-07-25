@@ -1,7 +1,7 @@
 title: guybrush.sh
 author: Guybrush Threepwood
-url: "https://rpolverini.github.io/"
-baseurl: "/guybrush.sh"   # <-- EXACTO al nombre del repo
+url: "https://blog.polverini.com.ar"
+baseurl: ""   # vacío para dominio propio
 description: Notas técnicas, scripts y pensamientos random
 permalink: /:slug.html
 
