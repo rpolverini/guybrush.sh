@@ -255,13 +255,15 @@ Guardás, salís.
 
 Conectá:
 
-- monitor (sólo para esta primera vez)
-- **Ethernet con internet** — esto no es opcional
+- monitor y teclado (sólo para esta primera vez)
+- **red con internet** — esto no es opcional
 - corriente
 
-La red cableada importa de verdad en el primer arranque: HAOS viene con el sistema operativo, pero **descarga Home Assistant Core desde internet** la primera vez que enciende.
+La red importa de verdad en el primer arranque: HAOS viene con el sistema operativo, pero **descarga Home Assistant Core desde internet** la primera vez que enciende.
 
 Sin red, la pantalla se queda mirándote y no pasa nada.
+
+Lo ideal es Ethernet. Pero si no tenés un cable a mano —porque el router está en el techo, porque está lloviendo, porque la vida es así— no te frenes: [se puede configurar la wifi desde la consola](#-configurar-wifi-desde-la-consola) y más abajo está el paso a paso.
 
 Encendés.
 
@@ -277,18 +279,175 @@ Aguantá. Anda bien.
 
 ---
 
+# 📡 Configurar wifi desde la consola
+
+Si arrancaste con cable, saltá esta sección entera.
+
+Si no —y es un caso mucho más común de lo que los tutoriales admiten— acá está el camino completo. Todo esto se hace en la consola de la Wyse, con el teclado enchufado ahí, sin SSH ni nada.
+
+## El prompt `ha >` y la trampa del prefijo
+
+Cuando la consola te dice que el Supervisor está corriendo, apretá **Enter**. Aparece:
+
+```text
+ha >
+```
+
+Y acá está la primera trampa, que hace perder media hora a todo el mundo:
+
+**En este prompt NO se escribe `ha` adelante.**
+
+Toda la documentación oficial muestra los comandos como `ha network info`, porque asume que los corrés por SSH o desde el add-on Terminal. En la consola local ya estás *dentro* del CLI, así que va sólo:
+
+```text
+ha > network info
+```
+
+Si tipeás `ha network info` ahí, te va a decir que no conoce el comando. Y uno jura que el CLI está roto.
+
+Más abajo vamos a ver que, cuando salís a un shell de verdad, el prefijo **vuelve**. Es exactamente al revés. Tenelo presente.
+
+## Ver el estado de la red
+
+```text
+ha > network info
+```
+
+Y acá el segundo problema práctico: esa salida es un volcado enorme y **en la consola real no hay scrollback confiable**. La información que te interesa se va para arriba y no vuelve.
+
+Podés probar **`Shift + PageUp`** / **`Shift + PageDown`**, que en la consola de Linux mueve el buffer de video. En algunas Wyse funciona; en otras el firmware no lo soporta y no pasa nada.
+
+La solución de verdad es pedirle sólo la interfaz que te importa, porque `network info` acepta un argumento opcional:
+
+```text
+ha > network info wlp5s0u1
+```
+
+Eso entra en una pantalla y listo. No lo vas a encontrar en ningún tutorial, pero está en el CLI desde siempre.
+
+El nombre de tu interfaz wifi va a ser algo tipo `wlp5s0u1` o `wlan0`. Si aparece en el System Information del arranque, el kernel ya cargó el driver: buena señal, la placa USB está soportada.
+
+## `enabled: false` es normal. No busqués cómo habilitarla.
+
+Cuando mires el estado, lo más probable es que veas esto:
+
+```text
+connected: false
+enabled: false
+```
+
+Y la reacción natural es salir a buscar un comando para habilitar la interfaz.
+
+**No existe, y no hace falta.**
+
+Ese `false` no significa "roto" ni "deshabilitado a propósito". Significa **"todavía no configurada"**: HAOS deja la wifi dormida hasta que le des una red a la cual asociarse.
+
+Y lo mejor: el mismo comando que configura la red la habilita sola. Mirando el código del CLI se ve que el flag `--disabled` es `false` por defecto, y que el valor invertido se manda en **todas** las llamadas a `network update`. O sea que cada update dice `enabled: true` sin que vos hagas nada.
+
+Una llamada, tres cosas resueltas: habilitar, guardar credenciales y pedir IP.
+
+## Ver qué redes hay
+
+```text
+ha > network scan wlp5s0u1
+```
+
+Este paso vale la pena porque te confirma que la placa **realmente** ve redes, antes de que te pelees con la contraseña.
+
+Si te lista tus SSIDs, el chipset anda y ya ganamos.
+
+Si tira error, no te asustes: con la interfaz todavía deshabilitada el scan a veces falla. Salteálo y andá directo al update.
+
+## Conectar
+
+```text
+ha > network update wlp5s0u1 --ipv4-method auto --wifi-mode infrastructure --wifi-auth wpa-psk --wifi-ssid "MiRed" --wifi-psk "MiClave"
+```
+
+Cambiás `wlp5s0u1` por tu interfaz, y el SSID y la clave por los tuyos.
+
+Sobre los valores:
+
+- `--wifi-auth wpa-psk` sirve tanto para WPA2 como para WPA3-personal. Para una red abierta es `open` y sacás el `--wifi-psk`.
+- `--wifi-mode infrastructure` es el modo normal de cliente. La API asume `open` como default de auth, así que conviene pasar todo explícito.
+- **Las comillas dejalas siempre**, sobre todo si la clave tiene espacios, `$`, `!` o `#`.
+
+Tarda unos segundos y no siempre imprime algo útil. El silencio acá es buena señal.
+
+## Verificar
+
+```text
+ha > network info wlp5s0u1
+```
+
+Ahora tiene que decir `connected: true` y mostrar una IP donde antes decía `no addresses`.
+
+Anotátela. Esa es la dirección de tu Home Assistant.
+
+## Si no toma IP
+
+Por orden de probabilidad:
+
+- **Banda equivocada.** La red es de 5 GHz y la placa USB sólo hace 2.4 (o al revés). Si el router publica las dos bandas con el mismo nombre, probá separarlas.
+- **Clave mal escrita.** No hay comando para corregir sólo la clave: repetí el `network update` completo.
+- **SSID oculto.** No va a aparecer en el `scan`, pero el `update` funciona igual si el nombre está exacto.
+- **Caracteres raros en la clave** que el parser se come.
+
+## Cuando necesitás un shell de verdad
+
+Si en algún momento querés grepear una salida, guardarla en un archivo o mirar el `dmesg`, el prompt `ha >` no te alcanza: no es un shell. No hay pipes, no hay redirección, no hay `grep`. Si escribís `network info > /tmp/algo.txt`, el `>` se interpreta como un argumento más y falla.
+
+Para eso, desde la consola local:
+
+```text
+ha > login
+```
+
+Eso te deja en un shell del host. No pide contraseña porque estás físicamente frente a la máquina — y justamente por eso sólo funciona en la consola local y no por SSH.
+
+Y acá vuelve el prefijo que sacamos al principio:
+
+```bash
+ha network info > /tmp/net.txt
+cat /tmp/net.txt
+dmesg | grep -i wlp
+```
+
+Dentro del shell **sí** lleva `ha` adelante. Es la inversión exacta del prompt anterior, y es la cosa más confusa de todo el sistema.
+
+---
+
 # 🧭 Entrar a Home Assistant
 
 Desde cualquier compu de la misma red:
 
-http://homeassistant.local:8123
+http://homeassistant.local
 
-Si tu router es de los que no resuelven `.local` —pasa seguido con los que da la empresa de internet— probá:
+Ojo con esto, porque casi todos los tutoriales lo dicen mal: HAOS sirve la interfaz en el **puerto 80**, así que no hace falta agregar nada.
 
-- http://homeassistant:8123
-- `http://LA.IP.DE.LA.WYSE:8123`
+El famoso `:8123` es el **fallback**, para cuando el puerto 80 está ocupado (un reverse proxy, por ejemplo). Si `homeassistant.local` no responde, probá en este orden:
 
-Para averiguar la IP: entrá al router y buscá el cliente nuevo, o mirá la pantalla de la Wyse, que la muestra en el banner.
+- http://homeassistant.local:8123
+- http://homeassistant
+- `http://LA.IP.DE.LA.WYSE`
+
+Para averiguar la IP: el `network info` de la sección anterior, el banner de la consola, o el DHCP del router buscando el cliente nuevo llamado `homeassistant`.
+
+## El Observer, que nadie te menciona
+
+Hay una segunda dirección, y es la más útil cuando algo va a medias:
+
+http://homeassistant.local:4357
+
+Ese es el **Observer**, un servicio chiquito e independiente que te dice qué está haciendo el Supervisor mientras arranca.
+
+Sirve justo en el momento peor: cuando la instalación está a mitad de camino, la interfaz principal todavía no responde y no sabés si el sistema está trabajando o se colgó.
+
+Si el Observer contesta pero el 80 no, el sistema está vivo y todavía descargando. Paciencia.
+
+Si no contesta ninguno de los dos, ahí sí hay un problema de red o de arranque.
+
+## El onboarding
 
 Una vez que carga, el onboarding te pide:
 
@@ -336,11 +495,11 @@ Reiniciás y ahora sí.
 
 Antes de ponerte a jugar con automatizaciones y dashboards, hacé estas tres. Son quince minutos y te salvan de dolores futuros.
 
-**1. IP fija.** Reservá la IP de la Wyse en el DHCP del router. Todo lo que integres después va a apuntar a esa dirección, y el día que el router decida cambiarla se rompe medio sistema.
+**1. IP fija.** Reservá la IP de la Wyse en el DHCP del router. Todo lo que integres después va a apuntar a esa dirección, y el día que el router decida cambiarla se rompe medio sistema. Si te conectaste por wifi, esto importa el doble.
 
 **2. Backups automáticos.** En *Configuración → Sistema → Backups*. Programalos y mandalos afuera de la Wyse: un NAS, Google Drive vía add-on, lo que tengas. Un backup guardado en el mismo disco que se puede morir no es un backup, es una expresión de deseo.
 
-**3. Sacá el monitor.** Ya no lo necesitás. La Wyse arranca sola, sin teclado ni pantalla. Enchufala en el rincón donde va a vivir y olvidate.
+**3. Sacá el monitor.** Ya no lo necesitás. La Wyse arranca sola, sin teclado ni pantalla, y la configuración de red queda guardada. Enchufala en el rincón donde va a vivir y olvidate.
 
 Y si querés aprovechar que ahora tenés un puerto USB libre: un dongle **Zigbee** (un Sonoff ZBDongle-E, por ejemplo) convierte esto en un hub de domótica completo, sin nube y sin depender de la app de nadie.
 
@@ -389,7 +548,7 @@ Quince watts haciendo el trabajo que la industria te quiere cobrar por mes.
 
 Guybrush nunca compró un mapa completo: juntó tres pedazos sueltos y con eso encontró el tesoro.
 
-Nosotros juntamos una Wyse de Marketplace, un SSD rescatado y una imagen de GitHub.
+Nosotros juntamos una Wyse de Marketplace, un SSD rescatado, una imagen de GitHub y una placa wifi USB que andaba dando vueltas en un cajón —porque llovía y el cable de red no era una opción.
 
 Windows, mientras tanto, sigue buscando actualizaciones.
 
